@@ -126,8 +126,8 @@ static void appDiscStart(dmConnId_t connId)
       status = pAppDiscCb->cmplStatus;
     }
 
-    /* if discovery not complete */
-    if (status < APP_DISC_CMPL)
+    /* if discovery not complete , or if discovery complete but we are still not bonded or secured start discovery  */
+    if ((status < APP_DISC_CMPL) ||  (status == APP_DISC_CMPL && !AppCheckBonded(connId) &&  !pAppDiscCb->alreadySecure))
     {
       /* Read database hash first if not bonded or if secure but without bond. */
       if ((!pAppDiscCb->alreadySecure) || (pAppDiscCb->alreadySecure && !AppCheckBonded(connId)))
