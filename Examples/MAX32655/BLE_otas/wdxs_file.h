@@ -83,10 +83,20 @@ uint16_t WdxsFileGetFirmwareVersion(void);
  */
 /*************************************************************************************************/
 void initHeader(fileHeader_t *header);
+
+/*************************************************************************************************/
+/*!
+ *  \brief  Notify peer device of file transfer status
+ *
+ *  \param  Status
+ *
+ *  \return None.
+ */
+/*************************************************************************************************/
+void WdxsSendTransferStatus(transfer_status_t status);
 /*! \} */ /* WIRELESS_DATA_EXCHANGE_PROFILE */
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif // EXAMPLES_MAX32655_BLE_OTAS_WDXS_FILE_H_

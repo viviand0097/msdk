@@ -80,6 +80,7 @@ extern const uint8_t wdxsFtcUuid[ATT_128_UUID_LEN];         /*!< \brief WDX File
 extern const uint8_t wdxsFtdUuid[ATT_128_UUID_LEN];         /*!< \brief WDX File Transfer Data Characteristic */
 extern const uint8_t wdxsAuUuid[ATT_128_UUID_LEN];          /*!< \brief WDX Authentication Characteristic */
 
+typedef enum { TRANSFER_NEXT, TRANSFER_COMPLETE, TRANSFER_ABORT } transfer_status_t;
 /**************************************************************************************************
   Function Declarations
 **************************************************************************************************/

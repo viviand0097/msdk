@@ -41,7 +41,7 @@ extern "C" {
  */
 /*************************************************************************************************/
 void DatsStart(void);
-void datsSednTransferStatus(dmConnId_t connId, uint8_t size, uint8_t *msg);
+
 /*************************************************************************************************/
 /*!
  *  \brief  Application handler init function called during system initialization.

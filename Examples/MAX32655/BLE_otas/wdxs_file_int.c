@@ -219,10 +219,8 @@ void wdxsFileWriteHandler(wsfEventMask_t event, wsfMsgHdr_t *pMsg)
         WsfCsExit();
 
         APP_TRACE_INFO2("Int. Flash: Wrote %d bytes @ 0x%x", writeLen, writeAddress);
-        //send notification to send next packet, this would be a wdxs transfer status char
-        // with status of "Continue" or "SEND_NEXT_PACKET" etc...
-        uint8_t str[] = "Next";
-        datsSednTransferStatus(1, sizeof(str), str);
+        /* Notify peer to send next packet */
+        WdxsSendTransferStatus(TRANSFER_NEXT);
         /* Get the next message */
         queueMsg = WsfMsgDeq(&writeQueue, &retHandler);
     }
@@ -515,4 +513,11 @@ void initHeader(fileHeader_t *header)
 {
     fileHeader.fileLen = header->fileLen;
     fileHeader.fileCRC = header->fileCRC;
+}
+
+void WdxsSendTransferStatus(transfer_status_t status)
+{
+    /* send transfer status notification */
+    dmConnId_t connId = AppConnIsOpen();
+    AttsHandleValueNtf(connId, WDXS_FTC_CH_HDL, sizeof(transfer_status_t), &status);
 }

@@ -256,11 +256,7 @@ static void datsSendData(dmConnId_t connId, uint8_t size, uint8_t *msg)
         AttsHandleValueNtf(connId, WP_DAT_HDL, size, msg);
     }
 }
-void datsSednTransferStatus(dmConnId_t connId, uint8_t size, uint8_t *msg)
-{
-    /* send notification */
-    AttsHandleValueNtf(connId, WDXS_FTC_CH_HDL, size, msg);
-}
+
 /*************************************************************************************************/
 /*!
  *  \brief  Application DM callback.

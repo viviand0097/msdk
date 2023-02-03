@@ -516,7 +516,7 @@ static void datcOpen(dmEvt_t *pMsg) {}
 static void datcValueNtf(attEvt_t *pMsg)
 {
     // Notification from FILE TRANSFER CONTROL to send enxt packet
-    if (pMsg->handle == WDXS_FTC_CH_HDL) {
+    if (pMsg->handle == WDXS_FTC_CH_HDL && (transfer_status_t)*pMsg->pValue == TRANSFER_NEXT) {
         dmConnId_t connId = 1;
 
         if (datcCb.sendingFile[connId - 1] == TRUE) {
@@ -676,7 +676,7 @@ static void datcSendBlock(dmConnId_t connId, uint32_t address, uint32_t len, uin
     memcpy(addrData, &address, sizeof(uint32_t));
     memcpy(&addrData[sizeof(uint32_t)], pData, len);
 
-    APP_TRACE_INFO2("Sending addr: 0x%08X len: 0x%04X", address, len);
+    APP_TRACE_INFO2("Sending addr: 0x%08X len: %d", address, len);
 
     /* Send the address and data, add the length of the address to the length */
     WdxcFtdSendBlock(connId, len + sizeof(uint32_t), addrData);
