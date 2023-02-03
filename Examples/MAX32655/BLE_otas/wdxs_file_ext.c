@@ -281,6 +281,8 @@ static uint8_t wdxsFileWrite(const uint8_t *pBuf, uint8_t *pAddress, uint32_t si
         lastWriteAddr = pAddress;
         lastWriteLen = size;
         APP_TRACE_INFO2("Ext Flash: Wrote %d bytes @ 0x%08x", size, pAddress);
+        /* Notify peer to send next packet */
+        WdxsSendTransferStatus(TRANSFER_NEXT);
     } else {
         APP_TRACE_ERR1("Error writing to flash 0x%08X", (uint32_t)pAddress);
         /* force a crc error so device does not reboot into bootloader */
@@ -425,4 +427,12 @@ void initHeader(fileHeader_t *header)
 {
     fileHeader.fileLen = header->fileLen;
     fileHeader.fileCRC = header->fileCRC;
+}
+
+
+void WdxsSendTransferStatus(transfer_status_t status)
+{
+    /* send transfer status notification */
+    dmConnId_t connId = AppConnIsOpen();
+    AttsHandleValueNtf(connId, WDXS_FTC_CH_HDL, sizeof(transfer_status_t), &status);
 }
