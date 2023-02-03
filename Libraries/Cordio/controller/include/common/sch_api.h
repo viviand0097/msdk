@@ -34,11 +34,21 @@ extern "C" {
 #endif
 
 /**************************************************************************************************
+  Constants
+**************************************************************************************************/
+
+/*! \brief      Scheduler states. */
+typedef enum {
+    SCH_STATE_IDLE, /*!< Scheduler idle. */
+    SCH_STATE_EXEC /*!< Scheduler executing BOD. */
+} schState_t;
+
+/**************************************************************************************************
   Data Types
 **************************************************************************************************/
 
 /*! \brief      Conflict action call signature. */
-typedef BbOpDesc_t*(*BbConflictAct_t)(BbOpDesc_t *pNewBod, BbOpDesc_t *pExistBod);
+typedef BbOpDesc_t *(*BbConflictAct_t)(BbOpDesc_t *pNewBod, BbOpDesc_t *pExistBod);
 
 /**************************************************************************************************
   Function Declarations
@@ -55,6 +65,7 @@ uint32_t SchStatsGetDelayLoadTotalCount(void);
 /* Control */
 void SchHandler(wsfEventMask_t event, wsfMsgHdr_t *pMsg);
 void SchLoadHandler(void);
+schState_t SchGetState(void);
 
 /* List maintenance */
 void SchInsertNextAvailable(BbOpDesc_t *pBod);

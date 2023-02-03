@@ -27,7 +27,7 @@ SRCS += stack_dats.c
 SRCS += dats_main.c
 SRCS += main.c
 
-USE_INTERNAL_FLASH ?=0
+USE_INTERNAL_FLASH ?=1
 ifeq ($(USE_INTERNAL_FLASH), 1)
 LINKERFILE = ota_internal_mem.ld
 SRCS += wdxs_file_int.c

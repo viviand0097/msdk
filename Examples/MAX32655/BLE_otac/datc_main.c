@@ -48,6 +48,7 @@
 #include "util/calc128.h"
 #include "wsf_efs.h"
 #include "wdxc/wdxc_api.h"
+#include "svc_wdxs.h"
 #include "wdx_defs.h"
 #include "pal_btn.h"
 #include "tmr.h"
@@ -129,7 +130,7 @@ typedef struct {
 } datcConnInfo_t;
 
 datcConnInfo_t datcConnInfo;
-
+static void datcSendBlock(dmConnId_t connId, uint32_t address, uint32_t len, uint8_t *pData);
 /**************************************************************************************************
   Configurable Parameters
 **************************************************************************************************/
@@ -514,8 +515,26 @@ static void datcOpen(dmEvt_t *pMsg) {}
 /*************************************************************************************************/
 static void datcValueNtf(attEvt_t *pMsg)
 {
-    /* print received message */
-    APP_TRACE_INFO0((const char *)pMsg->pValue);
+    // Notification from FILE TRANSFER CONTROL to send enxt packet
+    if (pMsg->handle == WDXS_FTC_CH_HDL) {
+        dmConnId_t connId = 1;
+
+        if (datcCb.sendingFile[connId - 1] == TRUE) {
+            uint32_t blockSize;
+            if ((datcCb.blockOffset[connId - 1] + BLOCK_SIZE) > FILE_SIZE) {
+                blockSize = FILE_SIZE - datcCb.blockOffset[connId - 1];
+            } else {
+                blockSize = BLOCK_SIZE;
+            }
+
+            /* Keep writing the file */
+            uint32_t address = datcCb.blockOffset[connId - 1] - BLOCK_OFFSET_INIT;
+            datcSendBlock(connId, address, blockSize, (uint8_t *)&datcCb.fileData[address]);
+        }
+    } else {
+        /* print received message */
+        APP_TRACE_INFO0((const char *)pMsg->pValue);
+    }
 }
 
 /*************************************************************************************************/
@@ -657,7 +676,7 @@ static void datcSendBlock(dmConnId_t connId, uint32_t address, uint32_t len, uin
     memcpy(addrData, &address, sizeof(uint32_t));
     memcpy(&addrData[sizeof(uint32_t)], pData, len);
 
-    // APP_TRACE_INFO2("Sending addr: 0x%08X len: 0x%04X", address, len);
+    APP_TRACE_INFO2("Sending addr: 0x%08X len: 0x%04X", address, len);
 
     /* Send the address and data, add the length of the address to the length */
     WdxcFtdSendBlock(connId, len + sizeof(uint32_t), addrData);
@@ -987,23 +1006,23 @@ static void datcProcMsg(dmEvt_t *pMsg)
 
     case ATTC_WRITE_CMD_RSP:
     case ATTC_WRITE_RSP: {
-        dmConnId_t connId = (dmConnId_t)pMsg->hdr.param;
+        // dmConnId_t connId = (dmConnId_t)pMsg->hdr.param;
 
-        if ((((attEvt_t *)pMsg)->hdr.status == ATT_SUCCESS) &&
-            (((attEvt_t *)pMsg)->handle == pDatcWdxHdlList[connId - 1][WDXC_FTD_HDL_IDX])) {
-            if (datcCb.sendingFile[connId - 1] == TRUE) {
-                uint32_t blockSize;
-                if ((datcCb.blockOffset[connId - 1] + BLOCK_SIZE) > FILE_SIZE) {
-                    blockSize = FILE_SIZE - datcCb.blockOffset[connId - 1];
-                } else {
-                    blockSize = BLOCK_SIZE;
-                }
+        // if ((((attEvt_t *)pMsg)->hdr.status == ATT_SUCCESS) &&
+        //     (((attEvt_t *)pMsg)->handle == pDatcWdxHdlList[connId - 1][WDXC_FTD_HDL_IDX])) {
+        //     if (datcCb.sendingFile[connId - 1] == TRUE) {
+        //         uint32_t blockSize;
+        //         if ((datcCb.blockOffset[connId - 1] + BLOCK_SIZE) > FILE_SIZE) {
+        //             blockSize = FILE_SIZE - datcCb.blockOffset[connId - 1];
+        //         } else {
+        //             blockSize = BLOCK_SIZE;
+        //         }
 
-                /* Keep writing the file */
-                uint32_t address = datcCb.blockOffset[connId - 1] - BLOCK_OFFSET_INIT;
-                datcSendBlock(connId, address, blockSize, (uint8_t *)&datcCb.fileData[address]);
-            }
-        }
+        //         /* Keep writing the file */
+        //         uint32_t address = datcCb.blockOffset[connId - 1] - BLOCK_OFFSET_INIT;
+        //         datcSendBlock(connId, address, blockSize, (uint8_t *)&datcCb.fileData[address]);
+        //     }
+        // }
         break;
     }
 

@@ -25,7 +25,7 @@
 #define EXAMPLES_MAX32655_BLE_OTAS_DATS_API_H_
 
 #include "wsf_os.h"
-
+#include "dm_api.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,7 +41,7 @@ extern "C" {
  */
 /*************************************************************************************************/
 void DatsStart(void);
-
+void datsSednTransferStatus(dmConnId_t connId, uint8_t size, uint8_t *msg);
 /*************************************************************************************************/
 /*!
  *  \brief  Application handler init function called during system initialization.
